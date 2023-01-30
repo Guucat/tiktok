@@ -37,6 +37,7 @@ func Upload(c *gin.Context) {
 	}
 
 	Ok(c, "success to upload file", nil)
+
 	// 初始化视频信息，存放mysql
 	//title := c.PostForm("title")
 

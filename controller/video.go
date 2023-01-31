@@ -5,7 +5,7 @@ import (
 	"log"
 	"strconv"
 	. "tiktok/mid"
-	. "tiktok/mid/oss"
+	"tiktok/model"
 	s "tiktok/service"
 	"time"
 )
@@ -13,34 +13,51 @@ import (
 func Upload(c *gin.Context) {
 	// 获取视频全局id
 	videoId, err := s.GetStoreId()
-	log.Println(videoId)
 	if err != nil {
-		Fail(c, "fail to generate id", nil)
+		Fail(c, "upload failed", nil)
 		return
 	}
-	// 将视频以id为名存放在本地
 
-	// 获取封面全局id
-	// 将封面以id为名存放在本地
-	// 调用oss存储视频，返回 video url
-	// 调用oss存放封面，返回 image url
+	// 获取视频数据
 	file, _ := c.FormFile("data")
 	f, err := file.Open()
 	if err != nil {
-		Fail(c, "fail to load video data", nil)
+		log.Println("fail to load video data", err)
+		Fail(c, "upload failed", nil)
 		return
 	}
-	err = Oss.PutObject(strconv.FormatInt(videoId, 10)+".mp4", f)
+	defer f.Close()
+
+	// 视频上传oss并获取视频url
+	videoUrl, err := s.StoreFileWithId(f, strconv.FormatInt(videoId, 10)+".mp4")
 	if err != nil {
-		Fail(c, "fail to store file", nil)
+		Fail(c, "upload failed", nil)
 		return
 	}
 
-	Ok(c, "success to upload file", nil)
+	// 获取封面url
+	imageUrl, err := s.GetSnapshot(f)
+	if err != nil {
+		Fail(c, "upload failed", nil)
+		return
+	}
 
 	// 初始化视频信息，存放mysql
-	//title := c.PostForm("title")
-
+	title := c.PostForm("title")
+	videoInfo := &model.Video{
+		Id:       videoId,
+		AuthorId: c.GetInt64("id"),
+		PlayUrl:  videoUrl,
+		CoverUrl: imageUrl,
+		Title:    title,
+		Time:     time.Now(),
+	}
+	err = s.SaveVideoInfo(videoInfo)
+	if err != nil {
+		Fail(c, "upload failed", nil)
+		return
+	}
+	Ok(c, "success to upload file", nil)
 }
 
 func GetFeed(c *gin.Context) {

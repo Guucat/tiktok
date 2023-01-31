@@ -8,9 +8,11 @@ import (
 var Oss *oss.Bucket
 
 const (
+	Root            = "http://tiktok-syam.oss-cn-hangzhou.aliyuncs.com/"
 	endpoint        = "http://oss-cn-hangzhou.aliyuncs.com"
 	accessKeyId     = "LTAI5tArBU9y1AEGeJVV8YjP"
 	accessKeySecret = "KS7csu53v4jK7f6BUHKsMhTCd2v6FS"
+	bucketName      = "tiktok-syam"
 )
 
 func Init() {
@@ -23,7 +25,7 @@ func Init() {
 		panic(err)
 	}
 
-	bucket, err := client.Bucket("tiktok-syam")
+	bucket, err := client.Bucket(bucketName)
 	if err != nil {
 		log.Println("fail to get bucket instance")
 		panic(err)

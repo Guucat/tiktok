@@ -9,21 +9,20 @@ import (
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
 
-	dGroup := r.Group("/douyin")
+	douyin := r.Group("/douyin")
 	{
-		dGroup.GET("/user/", jwt.Auth(), c.UserInfo)
-	}
+		douyin.GET("/user/", jwt.Auth(), c.UserInfo)
 
-	userGroup := dGroup.Group("/user")
-	{
-		userGroup.POST("/login/", c.Login)
-		userGroup.POST("/register/", c.Register)
-	}
+		user := douyin.Group("/user")
+		{
+			user.POST("/login/", c.Login)
+			user.POST("/register/", c.Register)
+		}
 
-	publishGroup := dGroup.Group("/publish")
-	{
-		publishGroup.POST("/action/", jwt.Auth(), c.Upload)
+		publish := douyin.Group("/publish")
+		{
+			publish.POST("/action/", jwt.Auth(), c.Upload)
+		}
 	}
-
 	return r
 }

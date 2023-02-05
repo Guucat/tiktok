@@ -10,19 +10,12 @@ func SetupRouter() *gin.Engine {
 	r := gin.Default()
 
 	douyin := r.Group("/douyin")
-	{
-		douyin.GET("/user/", jwt.Auth(), c.UserInfo)
 
-		user := douyin.Group("/user")
-		{
-			user.POST("/login/", c.Login)
-			user.POST("/register/", c.Register)
-		}
+	// 基础模块接口
+	douyin.GET("/user/", jwt.Auth(), c.UserInfo)
+	douyin.POST("/user/login/", jwt.Auth(), c.Login)
+	douyin.POST("/user/register/", jwt.Auth(), c.Register)
+	douyin.POST("/publish/action/", jwt.Auth(), c.Upload)
 
-		publish := douyin.Group("/publish")
-		{
-			publish.POST("/action/", jwt.Auth(), c.Upload)
-		}
-	}
 	return r
 }

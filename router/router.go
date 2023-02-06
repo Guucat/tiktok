@@ -13,8 +13,8 @@ func SetupRouter() *gin.Engine {
 
 	// 基础模块接口
 	douyin.GET("/user/", jwt.Auth(), c.UserInfo)
-	douyin.POST("/user/login/", jwt.Auth(), c.Login)
-	douyin.POST("/user/register/", jwt.Auth(), c.Register)
+	douyin.POST("/user/login/", c.Login)
+	douyin.POST("/user/register/", c.Register)
 	douyin.POST("/publish/action/", jwt.Auth(), c.Upload)
 
 	return r

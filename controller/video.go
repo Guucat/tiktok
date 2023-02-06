@@ -50,7 +50,6 @@ func Upload(c *gin.Context) {
 		PlayUrl:  videoUrl,
 		CoverUrl: imageUrl,
 		Title:    title,
-		Time:     time.Now(),
 	}
 	err = s.SaveVideoInfo(videoInfo)
 	if err != nil {

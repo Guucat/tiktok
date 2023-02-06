@@ -1,6 +1,8 @@
 package mysql
 
-import "tiktok/model"
+import (
+	"tiktok/model"
+)
 
 func GetUserByName(name string) (*model.User, error) {
 	var user *model.User

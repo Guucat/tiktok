@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"strconv"
 	. "tiktok/mid"
 	"tiktok/mid/jwt"
 	. "tiktok/mid/validate"
@@ -68,7 +69,8 @@ func UserInfo(c *gin.Context) {
 	id, _ := c.Get("id")
 	other := c.Query("user_id")
 
-	user, err := s.GetUserInfo(id.(string), other)
+	//user, err := s.GetUserInfo(id.(string), other)
+	user, err := s.GetUserInfo(strconv.FormatInt(id.(int64), 10), other)
 	data["user"] = user
 	if err != nil {
 		Fail(c, err.Error(), data)

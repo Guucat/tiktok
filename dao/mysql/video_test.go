@@ -4,7 +4,6 @@ import (
 	"log"
 	"testing"
 	"tiktok/model"
-	"time"
 )
 
 func TestInsertVideo(t *testing.T) {
@@ -16,7 +15,7 @@ func TestInsertVideo(t *testing.T) {
 		PlayUrl:  "test",
 		CoverUrl: "test",
 		Title:    "tt",
-		Time:     time.Now(),
+		//Time:     time.Now(),
 	}
 	if err := InsertVideo(v); err != nil {
 		log.Fatal("failed", err)

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"io"
 	"log"
 	"strconv"
 	. "tiktok/mid"
@@ -11,15 +12,13 @@ import (
 )
 
 func Upload(c *gin.Context) {
-	// 获取视频全局id
-	videoId, err := s.GetStoreId()
+	videoId, err := s.GetStoreId() // 获取视频唯一id
 	if err != nil {
 		Fail(c, "upload failed", nil)
 		return
 	}
 
-	// 获取视频数据
-	file, _ := c.FormFile("data")
+	file, _ := c.FormFile("data") //获取视频数据
 	f, err := file.Open()
 	if err != nil {
 		log.Println("fail to load video data", err)
@@ -28,24 +27,30 @@ func Upload(c *gin.Context) {
 	}
 	defer f.Close()
 
-	// 视频上传oss并获取视频url
-	videoUrl, err := s.StoreFileWithId(f, strconv.FormatInt(videoId, 10)+".mp4")
+	videoWriter, path, imageId, err := s.CreateFile() //存储视频到本地
+	if err != nil {
+		log.Println("fail to save video data", err)
+		Fail(c, "upload failed", nil)
+		return
+	}
+	fReader := io.TeeReader(f, videoWriter)
+
+	videoUrl, err := s.StoreFileWithId(fReader, strconv.FormatInt(videoId, 10)+".mp4") //上传视频
 	if err != nil {
 		Fail(c, "upload failed", nil)
 		return
 	}
 
-	// 获取封面url
-	imageUrl, err := s.GetSnapshot(f)
+	imageUrl, err := s.GetSnapshot(path, imageId) // 上传图片
 	if err != nil {
 		Fail(c, "upload failed", nil)
 		return
 	}
 
-	// 初始化视频信息，存放mysql
 	title := c.PostForm("title")
+	vId, _ := strconv.ParseInt(strconv.FormatInt(videoId, 10), 10, 64)
 	videoInfo := &model.Video{
-		Id:       videoId,
+		Id:       vId,
 		AuthorId: c.GetInt64("id"),
 		PlayUrl:  videoUrl,
 		CoverUrl: imageUrl,
@@ -56,6 +61,7 @@ func Upload(c *gin.Context) {
 		Fail(c, "upload failed", nil)
 		return
 	}
+
 	Ok(c, "success to upload file", nil)
 }
 

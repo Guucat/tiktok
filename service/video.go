@@ -38,32 +38,11 @@ func StoreFileWithId(f io.Reader, id string) (url string, err error) {
 }
 
 // GetSnapshot 截取视频第一帧作为封面，上传至oss并返回访问地址
-func GetSnapshot(video io.Reader) (url string, err error) {
-	id, err := GetStoreId()
-	if err != nil {
-		return
-	}
-
-	// 将视频文件存储到本地
-	os.Mkdir(path, 7777)
-	filePath := path + strconv.FormatInt(id, 10) + ".map4"
-	f, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE, 0666)
-	if err != nil {
-		log.Println("fail to create file", err)
-		return
-	}
-	defer os.Remove(filePath)
-	defer f.Close()
-	_, err = io.Copy(f, video)
-	if err != nil {
-		log.Println("fail to copy video file", err)
-		return
-	}
-
+func GetSnapshot(videoPath, id string) (url string, err error) {
 	// 截取视频第一帧作为封面
 	buf := bytes.NewBuffer(nil)
 	frameNum := 1
-	err = ffmpeg.Input(filePath).
+	err = ffmpeg.Input(videoPath).
 		Filter("select", ffmpeg.Args{fmt.Sprintf("gte(n, %d)", frameNum)}).
 		Output("pipe:", ffmpeg.KwArgs{"vframes": 1, "format": "image2", "vcodec": "mjpeg"}).
 		WithOutput(buf, os.Stdout).
@@ -79,17 +58,18 @@ func GetSnapshot(video io.Reader) (url string, err error) {
 	}
 
 	// 存储封面图片到本地
-	imagePath := path + strconv.FormatInt(id, 10) + ".png"
+	imagePath := path + id + ".png"
 	err = imaging.Save(img, imagePath)
 	if err != nil {
 		log.Println("fail to save image: ", err)
 		return
 	}
 	defer os.Remove(imagePath)
+	defer os.Remove(videoPath)
 
 	// 上传图片至oss
 	imageFH, _ := os.Open(imagePath)
-	return StoreFileWithId(imageFH, strconv.FormatInt(id, 10))
+	return StoreFileWithId(imageFH, id+".png")
 }
 
 func SaveVideoInfo(v *model.Video) error {
@@ -106,4 +86,19 @@ func IsFavorite(userId, videoId string) bool {
 
 func GetVideoFeed(start time.Time) ([]model.Video, error) {
 	return mysql.QueryVideoList("", start)
+}
+
+func CreateFile() (io.Writer, string, string, error) {
+	id, err := GetStoreId()
+	strId := strconv.FormatInt(id, 10)
+	if err != nil {
+		return nil, "", "", err
+	}
+	filePath := path + strId + ".mp4"
+	localFile, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE, 0666)
+	if err != nil {
+		log.Println("fail to create file", err)
+		return nil, "", "", err
+	}
+	return localFile, filePath, strId, nil
 }

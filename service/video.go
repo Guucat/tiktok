@@ -16,7 +16,7 @@ import (
 	"time"
 )
 
-const path = "/Users/tsy/tiktok_upload/"
+const path = "./"
 
 func GetStoreId() (int64, error) {
 	// 单机版机器id固定

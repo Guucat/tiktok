@@ -48,7 +48,7 @@ func GetUserInfo(id, otherId string) (gin.H, error) {
 		return user, errors.New("user doesn't exist")
 	}
 
-	user["id"] = otherId
+	user["id"] = otherIdn
 	user["name"] = name
 	GetFollowInfo(idn, otherIdn, user)
 	return user, nil

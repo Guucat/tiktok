@@ -72,7 +72,7 @@ func GetFeed(c *gin.Context) {
 }
 
 func List(c *gin.Context) {
-	id := c.GetString("id")
+	id := c.Query("user_id")
 	videos, err := s.GetVideoList(id)
 	if err != nil {
 		log.Println("fail to get video list", err)
@@ -81,10 +81,11 @@ func List(c *gin.Context) {
 	}
 	list := make([]Video, len(videos))
 	for i, v := range videos {
-		author, err := s.GetUserInfo(id, id)
+		author, err := s.GetUserInfo(c.GetString("id"), id)
 		if err != nil {
 			log.Println("fail to get user info", err)
 			Fail(c, "user doesn't exist", gin.H{"video_list": nil})
+			return
 		}
 		list[i] = Video{
 			Id:    v.Id,
@@ -126,13 +127,14 @@ func Feed(c *gin.Context) {
 	id := c.GetString("id")
 	list := make([]Video, len(videos))
 	for i, v := range videos {
-		author, err := s.GetUserInfo(id, id)
+		author, err := s.GetUserInfo(id, strconv.FormatInt(v.AuthorId, 10))
 		if err != nil {
 			log.Println("fail to get user info", err)
 			Fail(c, "user doesn't exist", gin.H{"" +
 				"next_time": nil,
 				"video_list": nil,
 			})
+			return
 		}
 		list[i] = Video{
 			Id:    v.Id,

@@ -28,6 +28,6 @@ func QueryVideoList(id string, start interface{}) ([]model.Video, error) {
 
 func QueryFavorite(userId, videioId interface{}) bool {
 	n := 0
-	DB.Table("user_favorite_video").Select("count(*)").Where("`user_id` = ? and `videio_id` = ?", userId, videioId).Find(&n)
+	DB.Table("user_favorite_video").Select("count(*)").Where("`user_id` = ? and `video_id` = ?", userId, videioId).Find(&n)
 	return n == 1
 }

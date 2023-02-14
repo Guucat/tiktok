@@ -13,9 +13,10 @@ import (
 	"tiktok/dao/mysql"
 	. "tiktok/mid/oss"
 	"tiktok/model"
+	"time"
 )
 
-const path = "~/tiktok_upload"
+const path = "/Users/tsy/tiktok_upload/"
 
 func GetStoreId() (int64, error) {
 	// 单机版机器id固定
@@ -46,7 +47,7 @@ func GetSnapshot(video io.Reader) (url string, err error) {
 	// 将视频文件存储到本地
 	os.Mkdir(path, 7777)
 	filePath := path + strconv.FormatInt(id, 10) + ".map4"
-	f, err := os.Create(filePath)
+	f, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		log.Println("fail to create file", err)
 		return
@@ -93,4 +94,16 @@ func GetSnapshot(video io.Reader) (url string, err error) {
 
 func SaveVideoInfo(v *model.Video) error {
 	return mysql.InsertVideo(v)
+}
+
+func GetVideoList(id string) ([]model.Video, error) {
+	return mysql.QueryVideoList(id, nil)
+}
+
+func IsFavorite(userId, videoId string) bool {
+	return mysql.QueryFavorite(userId, videoId)
+}
+
+func GetVideoFeed(start time.Time) ([]model.Video, error) {
+	return mysql.QueryVideoList("", start)
 }

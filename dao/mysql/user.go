@@ -1,16 +1,16 @@
 package mysql
 
 import (
+	"gorm.io/gorm"
+	"log"
 	"tiktok/model"
 )
 
-func GetUserByName(name string) (*model.User, error) {
-	var user *model.User
-	err := DB.Select("username").Where("username = ?", name).First(&user).Error
-	if err != nil {
-		return nil, err
-	}
-	return user, nil
+// true, if user exist.
+func SelectUserByName(name string) bool {
+	n := 0
+	DB.Table("users").Select("count(*)").Where("username = ?", name).Find(&n)
+	return n >= 1
 }
 
 func GetUserByNamePwd(name, pwd string) (*model.User, error) {
@@ -22,11 +22,15 @@ func GetUserByNamePwd(name, pwd string) (*model.User, error) {
 	return user, nil
 }
 
-func InsertUser(name string, pwd string) {
-	DB.Create(&model.User{
-		Username: name,
-		Password: pwd,
+func InsertUser(u *model.User) error {
+	err := DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(u).Error; err != nil {
+			log.Println("fail to insert user", err)
+			return err
+		}
+		return nil
 	})
+	return err
 }
 
 // 关注数

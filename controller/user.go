@@ -10,10 +10,10 @@ import (
 	s "tiktok/service"
 )
 
-// Register TODO 获取user id时会回表，效率低如何只操作1次数据库？
+// Register TODO 获取user id时会回表，效率低如何只操作1次数据库 ok
 func Register(c *gin.Context) {
 	data := gin.H{
-		"user_id": "",
+		"user_id": 0,
 		"token":   "",
 	}
 	// Get and verify  user info
@@ -26,12 +26,15 @@ func Register(c *gin.Context) {
 	}
 
 	// Register user
-	err = s.Register(name, pwd)
-	if err != nil {
+	user := &model.User{
+		Username: name,
+		Password: pwd,
+	}
+	if err = s.Register(user); err != nil {
 		Fail(c, "Registration failed Account has been registered", data)
 		return
 	}
-	user, _ := s.VerifyUser(name, pwd)
+
 	data["user_id"] = user.Id
 	data["token"], _ = jwt.GenToken(user.Id)
 	Ok(c, "registered successfully", data)
@@ -39,7 +42,7 @@ func Register(c *gin.Context) {
 
 func Login(c *gin.Context) {
 	data := gin.H{
-		"user_id": "",
+		"user_id": 0,
 		"token":   "",
 	}
 	// // Get user info
@@ -71,9 +74,11 @@ func UserInfo(c *gin.Context) {
 
 	//user, err := s.GetUserInfo(id.(string), other)
 	user, err := s.GetUserInfo(strconv.FormatInt(id.(int64), 10), other)
-	data["user"] = user
 	if err != nil {
 		Fail(c, err.Error(), data)
+		return
 	}
+
+	data["user"] = user
 	Ok(c, "user info", data)
 }

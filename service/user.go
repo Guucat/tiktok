@@ -3,20 +3,14 @@ package service
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"strconv"
 	. "tiktok/dao/mysql"
 	"tiktok/model"
 )
 
-func Register(name string, pwd string) error {
-	_, err := GetUserByName(name)
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			InsertUser(name, pwd)
-			return nil
-		}
-		return err
+func Register(u *model.User) error {
+	if !SelectUserByName(u.Username) {
+		return InsertUser(u)
 	}
 	return errors.New("user already exists")
 }
@@ -28,7 +22,7 @@ func VerifyUser(name, pwd string) (*model.User, error) {
 func GetFollowInfo(id int64, other int64, h gin.H) {
 	h["follow_count"] = GetFollowCount(other)
 	h["follower_count"] = GetFollowerCount(other)
-	if id != other {
+	if id != other && id != 0 {
 		h["is_follow"] = IsFollower(id, other)
 	} else {
 		h["is_follow"] = true

@@ -125,6 +125,9 @@ func Feed(c *gin.Context) {
 	}
 
 	id := c.GetString("id")
+	if id == "" {
+		id = "0"
+	}
 	list := make([]Video, len(videos))
 	for i, v := range videos {
 		author, err := s.GetUserInfo(id, strconv.FormatInt(v.AuthorId, 10))

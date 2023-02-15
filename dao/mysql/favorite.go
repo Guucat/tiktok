@@ -9,17 +9,33 @@ import (
 func AddFavoriteCount(videoId string, userId interface{}) (err error) {
 	//开启事务
 	err = DB.Transaction(func(tx *gorm.DB) error {
-		//增加点赞数
-		if err = tx.Table("videos").Where("id = ?", videoId).
-			UpdateColumn("favorite_count", gorm.Expr("favorite_count + ?", 1)).Error; err != nil {
+		//判断点赞记录是否存在或被软删除
+		id := -1
+		if err = tx.Table("user_favorite_video").Where("user_id = ? and video_id = ?", userId, videoId).
+			Select("id").Find(&id).Error; err != nil {
 			log.Println("Fail to like", err)
 			return err
 		}
-		//存入点赞数据
-		if err = tx.Table("user_favorite_video").Create(map[string]interface{}{
-			"user_id":  userId,
-			"video_id": videoId,
-		}).Error; err != nil {
+		if id == -1 {
+			//数据库还不存在该点赞数据，存入点赞数据
+			if err = tx.Table("user_favorite_video").Create(map[string]interface{}{
+				"user_id":  userId,
+				"video_id": videoId,
+			}).Error; err != nil {
+				log.Println("Fail to like", err)
+				return err
+			}
+		}
+		//数据库已存在该点赞数据，只是软删除了，把state=1
+		if err = tx.Table("user_favorite_video").Where("user_id = ? and video_id = ?", userId, videoId).
+			Update("state", 1).Error; err != nil {
+			log.Println("Fail to like", err)
+			return err
+		}
+
+		//增加点赞数
+		if err = tx.Table("videos").Where("id = ?", videoId).
+			UpdateColumn("favorite_count", gorm.Expr("favorite_count + ?", 1)).Error; err != nil {
 			log.Println("Fail to like", err)
 			return err
 		}
@@ -33,7 +49,6 @@ func AddFavoriteCount(videoId string, userId interface{}) (err error) {
 
 func SubFavoriteCount(videoId string, userId interface{}) (err error) {
 	err = DB.Transaction(func(tx *gorm.DB) error {
-
 		if err = tx.Table("videos").Where("id = ?", videoId).
 			UpdateColumn("favorite_count", gorm.Expr("favorite_count - ?", 1)).Error; err != nil {
 			log.Println("Fail to like", err)

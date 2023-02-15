@@ -109,10 +109,10 @@ func List(c *gin.Context) {
 
 func Feed(c *gin.Context) {
 	stamp := c.Query("latest_time")
-	start := time.Now()
+	start := time.Now().Format("2006-01-02 15:04:05")
 	if stamp != "" {
 		timeStamp, _ := strconv.ParseInt(stamp, 10, 64)
-		start = time.Unix(timeStamp, 0)
+		start = time.Unix(timeStamp, 0).Format("2006-01-02 15:04:05")
 	}
 	videos, err := s.GetVideoFeed(start)
 	if err != nil {
@@ -155,9 +155,9 @@ func Feed(c *gin.Context) {
 	}
 
 	// 如果没有新视频, 循环获取
-	nextTime := time.Now()
+	nextTime := time.Now().Unix()
 	if len(videos) > 0 {
-		nextTime = videos[len(videos)-1].CreateTime
+		nextTime = videos[len(videos)-1].CreateTime.Unix()
 	}
 	Ok(c, "success", gin.H{
 		"next_time":  nextTime,

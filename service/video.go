@@ -13,7 +13,6 @@ import (
 	"tiktok/dao/mysql"
 	. "tiktok/mid/oss"
 	"tiktok/model"
-	"time"
 )
 
 const path = "./"
@@ -84,7 +83,7 @@ func IsFavorite(userId, videoId string) bool {
 	return mysql.QueryFavorite(userId, videoId)
 }
 
-func GetVideoFeed(start time.Time) ([]model.Video, error) {
+func GetVideoFeed(start string) ([]model.Video, error) {
 	return mysql.QueryVideoList("", start)
 }
 

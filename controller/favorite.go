@@ -37,7 +37,7 @@ func FavoriteList(c *gin.Context) {
 		log.Println("Fetch error", err)
 		return
 	}
-	var videoList = make([]Video, 10)
+	var videoList = make([]Video, 0, 10)
 	for _, videoDao := range videoMessage {
 		authorMessage, err := service.GetAuthorMessage(videoDao.AuthorId)
 		if err != nil {

@@ -13,54 +13,64 @@ import (
 
 func Upload(c *gin.Context) {
 	videoId, err := s.GetStoreId() // 获取视频唯一id
+	title := c.PostForm("title")
+	authorId := c.GetInt64("id")
 	if err != nil {
 		Fail(c, "upload failed", nil)
 		return
 	}
 
 	file, _ := c.FormFile("data") //获取视频数据
+	if file == nil {
+		log.Println("vedio is empty", err)
+		Fail(c, "video is empty", nil)
+		return
+	}
+
 	f, err := file.Open()
 	if err != nil {
 		log.Println("fail to load video data", err)
 		Fail(c, "upload failed", nil)
 		return
 	}
-	defer f.Close()
 
-	videoWriter, path, imageId, err := s.CreateFile() //存储视频到本地
-	if err != nil {
-		log.Println("fail to save video data", err)
-		Fail(c, "upload failed", nil)
-		return
-	}
-	fReader := io.TeeReader(f, videoWriter)
+	// upload asynchronization
+	go func() {
+		defer f.Close()
+		videoWriter, path, imageId, err := s.CreateFile() //存储视频到本地
+		if err != nil {
+			log.Println("fail to save video data", err)
+			Fail(c, "upload failed", nil)
+			return
+		}
+		fReader := io.TeeReader(f, videoWriter)
 
-	videoUrl, err := s.StoreFileWithId(fReader, strconv.FormatInt(videoId, 10)+".mp4") //上传视频
-	if err != nil {
-		Fail(c, "upload failed", nil)
-		return
-	}
+		videoUrl, err := s.StoreFileWithId(fReader, strconv.FormatInt(videoId, 10)+".mp4") //上传视频
+		if err != nil {
+			Fail(c, "upload failed", nil)
+			return
+		}
 
-	imageUrl, err := s.GetSnapshot(path, imageId) // 上传图片
-	if err != nil {
-		Fail(c, "upload failed", nil)
-		return
-	}
+		imageUrl, err := s.GetSnapshot(path, imageId) // 上传图片
+		if err != nil {
+			Fail(c, "upload failed", nil)
+			return
+		}
 
-	title := c.PostForm("title")
-	vId, _ := strconv.ParseInt(strconv.FormatInt(videoId, 10), 10, 64)
-	videoInfo := &model.Video{
-		Id:       vId,
-		AuthorId: c.GetInt64("id"),
-		PlayUrl:  videoUrl,
-		CoverUrl: imageUrl,
-		Title:    title,
-	}
-	err = s.SaveVideoInfo(videoInfo)
-	if err != nil {
-		Fail(c, "upload failed", nil)
-		return
-	}
+		vId, _ := strconv.ParseInt(strconv.FormatInt(videoId, 10), 10, 64)
+		videoInfo := &model.Video{
+			Id:       vId,
+			AuthorId: authorId,
+			PlayUrl:  videoUrl,
+			CoverUrl: imageUrl,
+			Title:    title,
+		}
+		err = s.SaveVideoInfo(videoInfo)
+		if err != nil {
+			Fail(c, "upload failed", nil)
+			return
+		}
+	}()
 
 	Ok(c, "success to upload file", nil)
 }

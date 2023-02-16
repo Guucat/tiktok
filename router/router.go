@@ -23,7 +23,7 @@ func SetupRouter() *gin.Engine {
 	douyin.POST("/favorite/action/", jwt.Auth(), c.FavoriteAction)
 	douyin.GET("/favorite/list/", jwt.Auth(), c.FavoriteList)
 	douyin.POST("/comment/action/", jwt.Auth(), c.CommentAction)
-	//douyin.GET("/comment/list/", jwt.Auth(), c.CommentList)
+	douyin.GET("/comment/list/", jwt.Auth(), c.CommentList)
 
 	return r
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"tiktok/dao/mysql"
 	"tiktok/service"
 	"time"
 )
@@ -61,5 +62,51 @@ func CommentAction(c *gin.Context) {
 		StatusCode: 0,
 		StatusMsg:  "success to Comment",
 		Comment:    comment,
+	})
+}
+
+type CommentListResponse struct {
+	StatusCode  int32     `json:"status_code"`          // 状态码，0-成功，其他值-失败
+	StatusMsg   string    `json:"status_msg,omitempty"` // 返回状态描述
+	CommentList []Comment `json:"comment_list,omitempty"`
+}
+
+func CommentList(c *gin.Context) {
+	videoId := c.Query("video_id")
+	commentMessage, err := service.CommentList(videoId)
+	userId, _ := c.Get("id")
+	if err != nil {
+		log.Println("Fetch error", err)
+		return
+	}
+
+	var commentList = make([]Comment, 0, 10)
+	for _, commentDao := range commentMessage {
+		userMessage, err := service.GetAuthorMessage(commentDao.UserId)
+		if err != nil {
+			log.Println("Fetch error", err)
+			return
+		}
+		isFollower := mysql.IsFollowerAuthor(userId, commentDao.UserId)
+		user := User{
+			Id:            userMessage.Id,
+			Name:          userMessage.Username,
+			FollowCount:   userMessage.FollowCount,
+			FollowerCount: userMessage.FollowerCount,
+			IsFollow:      isFollower,
+		}
+		comment := Comment{
+			Id:         commentDao.Id,
+			User:       user,
+			Content:    commentDao.Content,
+			CreateDate: commentDao.CreateDate,
+		}
+		commentList = append(commentList, comment)
+	}
+
+	c.JSON(http.StatusOK, CommentListResponse{
+		StatusCode:  0,
+		StatusMsg:   "success",
+		CommentList: commentList,
 	})
 }

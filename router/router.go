@@ -26,6 +26,8 @@ func SetupRouter() *gin.Engine {
 	//douyin.GET("/comment/list/", jwt.Auth(), c.CommentList)
 
 	// 社交接口
-	douyin.POST("/follow/action", jwt.Auth(), c.FollowAction)
+	douyin.POST("/relation/action/", jwt.Auth(), c.FollowAction)
+	douyin.GET("/relation/follow/list/", jwt.Auth(), c.FollowList)
+
 	return r
 }

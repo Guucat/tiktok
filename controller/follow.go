@@ -22,3 +22,7 @@ func FollowAction(c *gin.Context){
 		service.
 	}
 }
+
+func FollowList(c *gin.Context)  {
+	userID, _ := c.Get("id")
+}

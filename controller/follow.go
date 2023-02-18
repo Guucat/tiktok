@@ -1,36 +1,24 @@
 package controller
 
 import (
-	"fmt"
-	"io/ioutil"
-	"net/http"
+	"github.com/gin-gonic/gin"
+	"tiktok/service"
 )
 
-func main() {
+type FollowActionResponse struct {
+	StatusCode int 32 json:"status_code"
+	StatusMsg string json:"status_msg, omitempty"
+}
 
-	url := "/douyin/relation/action/?token=&to_user_id=&action_type="
-	method := "POST"
+func FollowAction(c *gin.Context){
+	toUserId := c.Query("to_user_id") //所关注用户id
+	actionType := c.Query("action_type") //1-关注，2-取消关注
+	userID, _ := c.Get("id")
 
-	client := &http.Client{}
-	req, err := http.NewRequest(method, url, nil)
+	/*
 
-	if err != nil {
-		fmt.Println(err)
-		return
+	 */
+	if actionType == '1'{
+		service.
 	}
-	req.Header.Add("User-Agent", "Apifox/1.0.0 (https://www.apifox.cn)")
-
-	res, err := client.Do(req)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	defer res.Body.Close()
-
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println(string(body))
 }

@@ -10,6 +10,7 @@ type FollowActionResponse struct {
 	StatusMsg string json:"status_msg, omitempty"
 }
 
+// FollowAction 关注操作
 func FollowAction(c *gin.Context){
 	toUserId := c.Query("to_user_id") //所关注用户id
 	actionType := c.Query("action_type") //1-关注，2-取消关注
@@ -23,6 +24,11 @@ func FollowAction(c *gin.Context){
 	}
 }
 
+// FollowList 关注列表
 func FollowList(c *gin.Context)  {
+	userID, _ := c.Get("id")
+}
+// FollowerList 粉丝列表
+func FollowerList(c *gin.Context){
 	userID, _ := c.Get("id")
 }

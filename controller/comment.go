@@ -49,11 +49,17 @@ func CommentAction(c *gin.Context) {
 	comment := Comment{
 		Id: commentId,
 		User: User{
-			Id:            userMessage.Id,
-			Name:          userMessage.Username,
-			FollowCount:   userMessage.FollowCount,
-			FollowerCount: userMessage.FollowerCount,
-			IsFollow:      userMessage.IsFollow,
+			Id:              userMessage.Id,
+			Name:            userMessage.Username,
+			FollowCount:     userMessage.FollowCount,
+			FollowerCount:   userMessage.FollowerCount,
+			Avatar:          userMessage.Avatar,
+			BackgroundImage: userMessage.BackgroundImage,
+			Signature:       userMessage.Signature,
+			TotalFavorited:  userMessage.TotalFavorited,
+			WorkCount:       userMessage.WorkCount,
+			FavoriteCount:   userMessage.FavoriteCount,
+			IsFollow:        userMessage.IsFollow,
 		},
 		Content:    commentText,
 		CreateDate: time.Now().Format("01-02"),
@@ -87,13 +93,19 @@ func CommentList(c *gin.Context) {
 			log.Println("Fetch error", err)
 			return
 		}
-		isFollower := mysql.IsFollowerAuthor(userId, commentDao.UserId)
+		isFollower := mysql.GetIsFollower(userId, commentDao.UserId)
 		user := User{
-			Id:            userMessage.Id,
-			Name:          userMessage.Username,
-			FollowCount:   userMessage.FollowCount,
-			FollowerCount: userMessage.FollowerCount,
-			IsFollow:      isFollower,
+			Id:              userMessage.Id,
+			Name:            userMessage.Username,
+			FollowCount:     userMessage.FollowCount,
+			FollowerCount:   userMessage.FollowerCount,
+			Avatar:          userMessage.Avatar,
+			BackgroundImage: userMessage.BackgroundImage,
+			Signature:       userMessage.Signature,
+			TotalFavorited:  userMessage.TotalFavorited,
+			WorkCount:       userMessage.WorkCount,
+			FavoriteCount:   userMessage.FavoriteCount,
+			IsFollow:        isFollower,
 		}
 		comment := Comment{
 			Id:         commentDao.Id,

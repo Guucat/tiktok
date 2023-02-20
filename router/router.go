@@ -19,11 +19,19 @@ func SetupRouter() *gin.Engine {
 	douyin.GET("/publish/list/", jwt.Auth(), c.List)
 	douyin.GET("/feed/", c.Feed)
 
-	// 互动接口 - I
+	// 互动接口
 	douyin.POST("/favorite/action/", jwt.Auth(), c.FavoriteAction)
 	douyin.GET("/favorite/list/", jwt.Auth(), c.FavoriteList)
 	douyin.POST("/comment/action/", jwt.Auth(), c.CommentAction)
-	//douyin.GET("/comment/list/", jwt.Auth(), c.CommentList)
+	douyin.GET("/comment/list/", jwt.Auth(), c.CommentList)
+
+	//社交接口
+	douyin.POST("/relation/action/", jwt.Auth(), c.RelationAction)
+	douyin.GET("/relation/follow/list/", jwt.Auth(), c.FollowList)
+	douyin.GET("/relation/follower/list/", jwt.Auth(), c.FollowerList)
+	douyin.GET("/relation/friend/list/", jwt.Auth(), c.FriendList)
+	douyin.GET("/message/chat/", jwt.Auth(), c.MessageChat)
+	douyin.POST("/message/action/", jwt.Auth(), c.MessageAction)
 
 	return r
 }

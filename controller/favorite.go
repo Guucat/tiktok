@@ -44,13 +44,19 @@ func FavoriteList(c *gin.Context) {
 			log.Println("Fetch error", err)
 			return
 		}
-		isFollower := mysql.IsFollowerAuthor(userId, authorMessage.Id)
+		isFollower := mysql.GetIsFollower(userId, authorMessage.Id)
 		author := User{
-			Id:            authorMessage.Id,
-			Name:          authorMessage.Username,
-			FollowCount:   authorMessage.FollowCount,
-			FollowerCount: authorMessage.FollowerCount,
-			IsFollow:      isFollower,
+			Id:              authorMessage.Id,
+			Name:            authorMessage.Username,
+			FollowCount:     authorMessage.FollowCount,
+			FollowerCount:   authorMessage.FollowerCount,
+			Avatar:          authorMessage.Avatar,
+			BackgroundImage: authorMessage.BackgroundImage,
+			Signature:       authorMessage.Signature,
+			TotalFavorited:  authorMessage.TotalFavorited,
+			WorkCount:       authorMessage.WorkCount,
+			FavoriteCount:   authorMessage.FavoriteCount,
+			IsFollow:        isFollower,
 		}
 		video := Video{
 			Id:            videoDao.Id,
@@ -66,7 +72,7 @@ func FavoriteList(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, FavoriteListResponse{
 		StatusCode: 0,
-		StatusMsg:  "success to like",
+		StatusMsg:  "success",
 		VideoList:  videoList,
 	})
 }

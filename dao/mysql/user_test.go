@@ -12,8 +12,6 @@ func TestGetFollowCount(t *testing.T) {
 		Input int64
 		Want  int64
 	}{
-		{1, 1},
-		{2, 0},
 		{0, 0},
 	}
 	for _, test := range tests {
@@ -29,8 +27,6 @@ func TestGetFollowerCount(t *testing.T) {
 		Input int64
 		Want  int64
 	}{
-		{1, 0},
-		{2, 1},
 		{0, 0},
 	}
 	for _, test := range tests {

@@ -35,20 +35,20 @@ func InsertUser(u *model.User) error {
 
 // 关注数
 func GetFollowCount(id int64) (n int64) {
-	DB.Table("followers").Select("count(*)").Where("from_user_id = ?", id).Find(&n)
+	DB.Table("followers").Select("count(*)").Where("`from_user_id` = ?", id).Find(&n)
 	return
 }
 
 // 粉丝数
 func GetFollowerCount(id int64) (n int64) {
-	DB.Table("followers").Select("count(*)").Where("to_user_id = ?", id).Find(&n)
+	DB.Table("followers").Select("count(*)").Where("`to_user_id` = ?", id).Find(&n)
 	return
 }
 
 // 自己是否关注他
 func IsFollower(yourId int64, otherId int64) bool {
 	n := 0
-	DB.Table("followers").Select("count(*)").Where("from_user_id = ? and to_user_id = ?", yourId, otherId).Find(&n)
+	DB.Table("followers").Select("count(*)").Where("`from_user_id` = ? and `to_user_id` = ?", yourId, otherId).Find(&n)
 	return n == 1
 }
 

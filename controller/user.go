@@ -72,7 +72,6 @@ func UserInfo(c *gin.Context) {
 	id, _ := c.Get("id")
 	other := c.Query("user_id")
 
-	//user, err := s.GetUserInfo(id.(string), other)
 	user, err := s.GetUserInfo(strconv.FormatInt(id.(int64), 10), other)
 	if err != nil {
 		Fail(c, err.Error(), data)

@@ -45,7 +45,13 @@ func GetUserInfo(id, otherId string) (gin.H, error) {
 	user["id"] = otherIdn
 	user["name"] = name
 	GetFollowInfo(idn, otherIdn, user)
+	GetWorkInfo(idn, user)
 	return user, nil
+}
+
+// 获赞总数，作品总数，喜欢总数
+func GetWorkInfo(id int64, h gin.H) {
+	h["total_favorited"], h["favorite_count"], h["work_count"] = GetTotalWorkCount(id)
 }
 
 func NewUserInfo() gin.H {
@@ -55,5 +61,12 @@ func NewUserInfo() gin.H {
 		"follow_count":   0,
 		"follower_count": 0,
 		"is_follow":      false,
+
+		"avatar":           "",
+		"background_image": "",
+		"signature":        "hello",
+		"total_favorited":  "",
+		"work_count":       0,
+		"favorite_count":   0,
 	}
 }

@@ -98,15 +98,9 @@ func List(c *gin.Context) {
 			return
 		}
 		list[i] = Video{
-			Id:    v.Id,
-			Title: v.Title,
-			Author: User{
-				Id:            author["id"].(int64),
-				Name:          author["name"].(string),
-				FollowCount:   author["follow_count"].(int64),
-				FollowerCount: author["follower_count"].(int64),
-				IsFollow:      author["is_follow"].(bool),
-			},
+			Id:            v.Id,
+			Title:         v.Title,
+			Author:        author,
 			PlayUrl:       v.PlayUrl,
 			CoverUrl:      v.CoverUrl,
 			FavoriteCount: v.FavoriteCount,
@@ -150,15 +144,9 @@ func Feed(c *gin.Context) {
 			return
 		}
 		list[i] = Video{
-			Id:    v.Id,
-			Title: v.Title,
-			Author: User{
-				Id:            author["id"].(int64),
-				Name:          author["name"].(string),
-				FollowCount:   author["follow_count"].(int64),
-				FollowerCount: author["follower_count"].(int64),
-				IsFollow:      author["is_follow"].(bool),
-			},
+			Id:            v.Id,
+			Title:         v.Title,
+			Author:        author,
 			PlayUrl:       v.PlayUrl,
 			CoverUrl:      v.CoverUrl,
 			FavoriteCount: v.FavoriteCount,

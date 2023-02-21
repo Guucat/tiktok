@@ -3,6 +3,7 @@ package mysql
 import (
 	"gorm.io/gorm"
 	"log"
+	"strconv"
 	"tiktok/model"
 )
 
@@ -56,4 +57,16 @@ func IsExistById(id int64) string {
 	name := ""
 	DB.Table("users").Select("username").Where("id = ?", id).Find(&name)
 	return name
+}
+
+// 获赞总数，喜欢总数, 作品总数，
+func GetTotalWorkCount(id int64) (favoritedN string, likeN int64, workN int64) {
+	n := 0
+	//favoritedN, likeN, workN := 0, 0, 0
+	DB.Table("users").
+		Select("total_favorited, favorite_count, work_count").
+		Where("user_id = ?", id).
+		Find(&n, &likeN, &workN)
+	favoritedN = strconv.Itoa(n)
+	return
 }

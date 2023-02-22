@@ -72,15 +72,12 @@ func GetSnapshot(videoPath, id string) (url string, err error) {
 }
 
 func SaveVideoInfo(v *model.Video) error {
+	//保存视频
 	return mysql.InsertVideo(v)
 }
 
 func GetVideoList(id string) ([]model.Video, error) {
 	return mysql.QueryVideoList(id, nil)
-}
-
-func IsFavorite(userId, videoId string) bool {
-	return mysql.QueryFavorite(userId, videoId)
 }
 
 func GetVideoFeed(start string) ([]model.Video, error) {

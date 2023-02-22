@@ -32,6 +32,12 @@ func AddFavoriteCount(videoId string, userId interface{}) (err error) {
 				log.Println("Fail to like", err)
 				return err
 			}
+			//增加用户喜欢数
+			if err = tx.Table("users").Where("id = ?", userId).
+				UpdateColumn("favorite_count", gorm.Expr("favorite_count + ?", 1)).Error; err != nil {
+				log.Println("Fail", err)
+				return err
+			}
 			return nil
 		}
 
@@ -41,10 +47,16 @@ func AddFavoriteCount(videoId string, userId interface{}) (err error) {
 			log.Println("Fail to like", err)
 			return err
 		}
-		//增加点赞数
+		//增加视频点赞数
 		if err = tx.Table("videos").Where("id = ?", videoId).
 			UpdateColumn("favorite_count", gorm.Expr("favorite_count + ?", 1)).Error; err != nil {
 			log.Println("Fail to like", err)
+			return err
+		}
+		//增加用户喜欢数
+		if err = tx.Table("users").Where("id = ?", userId).
+			UpdateColumn("favorite_count", gorm.Expr("favorite_count + ?", 1)).Error; err != nil {
+			log.Println("Fail", err)
 			return err
 		}
 		return nil
@@ -57,15 +69,32 @@ func AddFavoriteCount(videoId string, userId interface{}) (err error) {
 
 func SubFavoriteCount(videoId string, userId interface{}) (err error) {
 	err = DB.Transaction(func(tx *gorm.DB) error {
-		if err = tx.Table("videos").Where("id = ?", videoId).
-			UpdateColumn("favorite_count", gorm.Expr("favorite_count - ?", 1)).Error; err != nil {
+		id := -1
+		if err = tx.Table("user_favorite_video").
+			Where("user_id = ? and video_id = ? and state = 1", userId, videoId).
+			Select("id").Find(&id).Error; err != nil {
 			log.Println("Fail to like", err)
 			return err
 		}
-		if err = tx.Table("user_favorite_video").Where("user_id = ? AND video_id = ?", userId, videoId).
-			Update("state", "0").Error; err != nil {
-			log.Println("Fail to like", err)
-			return err
+
+		if id != -1 {
+			if err = tx.Table("videos").Where("id = ?", videoId).
+				UpdateColumn("favorite_count", gorm.Expr("favorite_count - ?", 1)).Error; err != nil {
+				log.Println("Fail to like", err)
+				return err
+			}
+			if err = tx.Table("user_favorite_video").Where("user_id = ? AND video_id = ?", userId, videoId).
+				Update("state", "0").Error; err != nil {
+				log.Println("Fail to like", err)
+				return err
+			}
+			//减少用户喜欢数
+			if err = tx.Table("users").Where("id = ?", userId).
+				UpdateColumn("favorite_count", gorm.Expr("favorite_count - ?", 1)).Error; err != nil {
+				log.Println("Fail", err)
+				return err
+			}
+			return nil
 		}
 		return nil
 	})
@@ -78,7 +107,7 @@ func SubFavoriteCount(videoId string, userId interface{}) (err error) {
 func GetFavoriteListByUserId(userId interface{}) (videoMessage []model.Video, err error) {
 	videoIds := make([]int, 0)
 	err = DB.Transaction(func(tx *gorm.DB) error {
-		if err = tx.Table("user_favorite_video").Where("user_id = ? AND state = ?", userId, 1).
+		if err = tx.Table("user_favorite_video").Where("user_id = ? AND state = 1", userId).
 			Select("video_id").Find(&videoIds).Error; err != nil {
 			log.Println("Fetch error", err)
 			return err

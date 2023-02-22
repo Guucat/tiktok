@@ -2,7 +2,9 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"log"
 	"strconv"
+	"tiktok/dao/mysql"
 	. "tiktok/mid"
 	"tiktok/mid/jwt"
 	. "tiktok/mid/validate"
@@ -67,15 +69,33 @@ func Login(c *gin.Context) {
 	Ok(c, "login successfully", data)
 }
 
+// UserInfo 获取用户信息
 func UserInfo(c *gin.Context) {
 	data := gin.H{"user": nil}
-	id, _ := c.Get("id")
-	other := c.Query("user_id")
-
-	user, err := s.GetUserInfo(strconv.FormatInt(id.(int64), 10), other)
+	authId, _ := c.Get("id")
+	userId := c.Query("user_id")
+	if strconv.FormatInt(authId.(int64), 10) != userId {
+		log.Println("非法参数")
+	}
+	userDao, err := s.GetAuthorMessage(userId)
 	if err != nil {
 		Fail(c, err.Error(), data)
 		return
+	}
+
+	isFollower := mysql.GetIsFollower(userId, userId)
+	user := User{
+		Id:              userDao.Id,
+		Name:            userDao.Username,
+		FollowCount:     userDao.FollowCount,
+		FollowerCount:   userDao.FollowerCount,
+		Avatar:          userDao.Avatar,
+		BackgroundImage: userDao.BackgroundImage,
+		Signature:       userDao.Signature,
+		TotalFavorited:  userDao.TotalFavorited,
+		WorkCount:       userDao.WorkCount,
+		FavoriteCount:   userDao.FavoriteCount,
+		IsFollow:        isFollower,
 	}
 
 	data["user"] = user

@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"strconv"
+	"tiktok/dao/mysql"
 	. "tiktok/mid"
 	"tiktok/model"
 	s "tiktok/service"
@@ -37,21 +38,23 @@ func Upload(c *gin.Context) {
 	// upload asynchronization
 	go func() {
 		defer f.Close()
-		videoWriter, path, imageId, err := s.CreateFile() //存储视频到本地
+		//存储视频到本地
+		videoWriter, path, imageId, err := s.CreateFile()
 		if err != nil {
 			log.Println("fail to save video data", err)
 			Fail(c, "upload failed", nil)
 			return
 		}
 		fReader := io.TeeReader(f, videoWriter)
-
-		videoUrl, err := s.StoreFileWithId(fReader, strconv.FormatInt(videoId, 10)+".mp4") //上传视频
+		//上传视频,返回视频url
+		videoUrl, err := s.StoreFileWithId(fReader, strconv.FormatInt(videoId, 10)+".mp4")
 		if err != nil {
 			Fail(c, "upload failed", nil)
 			return
 		}
 
-		imageUrl, err := s.GetSnapshot(path, imageId) // 上传图片
+		// 上传图片，返回图片url
+		imageUrl, err := s.GetSnapshot(path, imageId)
 		if err != nil {
 			Fail(c, "upload failed", nil)
 			return
@@ -82,33 +85,51 @@ func GetFeed(c *gin.Context) {
 }
 
 func List(c *gin.Context) {
-	id := c.Query("user_id")
-	videos, err := s.GetVideoList(id)
+	userId := c.Query("user_id")
+	videos, err := s.GetVideoList(userId)
 	if err != nil {
 		log.Println("fail to get video list", err)
 		Fail(c, "user doesn't exist", gin.H{"video_list": nil})
 		return
 	}
-	list := make([]Video, len(videos))
-	for i, v := range videos {
-		author, err := s.GetUserInfo(c.GetString("id"), id)
-		if err != nil {
-			log.Println("fail to get user info", err)
-			Fail(c, "user doesn't exist", gin.H{"video_list": nil})
-			return
-		}
-		list[i] = Video{
+
+	userDao, err := s.GetAuthorMessage(userId)
+	if err != nil {
+		log.Println("fail to get user info", err)
+		Fail(c, "user doesn't exist", gin.H{"video_list": nil})
+		return
+	}
+	isFollow := mysql.GetIsFollower(userId, userId)
+	user := User{
+		Id:              userDao.Id,
+		Name:            userDao.Username,
+		FollowCount:     userDao.FollowCount,
+		FollowerCount:   userDao.FollowerCount,
+		Avatar:          userDao.Avatar,
+		BackgroundImage: userDao.BackgroundImage,
+		Signature:       userDao.Signature,
+		TotalFavorited:  userDao.TotalFavorited,
+		WorkCount:       userDao.WorkCount,
+		FavoriteCount:   userDao.FavoriteCount,
+		IsFollow:        isFollow,
+	}
+
+	videoList := make([]Video, 0, 20)
+	for _, v := range videos {
+		isFavorite := mysql.IsFavorite(userId, v.Id)
+		video := Video{
 			Id:            v.Id,
 			Title:         v.Title,
-			Author:        author,
+			Author:        user,
 			PlayUrl:       v.PlayUrl,
 			CoverUrl:      v.CoverUrl,
 			FavoriteCount: v.FavoriteCount,
 			CommentCount:  v.CommentCount,
-			IsFavorite:    s.IsFavorite(id, strconv.FormatInt(v.Id, 10)),
+			IsFavorite:    isFavorite,
 		}
+		videoList = append(videoList, video)
 	}
-	Ok(c, "success", gin.H{"video_list": list})
+	Ok(c, "success", gin.H{"video_list": videoList})
 }
 
 func Feed(c *gin.Context) {
@@ -134,7 +155,7 @@ func Feed(c *gin.Context) {
 	}
 	list := make([]Video, len(videos))
 	for i, v := range videos {
-		author, err := s.GetUserInfo(id, strconv.FormatInt(v.AuthorId, 10))
+		userDao, err := s.GetAuthorMessage(v.AuthorId)
 		if err != nil {
 			log.Println("fail to get user info", err)
 			Fail(c, "user doesn't exist", gin.H{"" +
@@ -143,15 +164,30 @@ func Feed(c *gin.Context) {
 			})
 			return
 		}
+		isFollow := mysql.GetIsFollower(id, v.AuthorId)
+		user := User{
+			Id:              userDao.Id,
+			Name:            userDao.Username,
+			FollowCount:     userDao.FollowCount,
+			FollowerCount:   userDao.FollowerCount,
+			Avatar:          userDao.Avatar,
+			BackgroundImage: userDao.BackgroundImage,
+			Signature:       userDao.Signature,
+			TotalFavorited:  userDao.TotalFavorited,
+			WorkCount:       userDao.WorkCount,
+			FavoriteCount:   userDao.FavoriteCount,
+			IsFollow:        isFollow,
+		}
+
 		list[i] = Video{
 			Id:            v.Id,
 			Title:         v.Title,
-			Author:        author,
+			Author:        user,
 			PlayUrl:       v.PlayUrl,
 			CoverUrl:      v.CoverUrl,
 			FavoriteCount: v.FavoriteCount,
 			CommentCount:  v.CommentCount,
-			IsFavorite:    s.IsFavorite(id, strconv.FormatInt(v.Id, 10)),
+			IsFavorite:    mysql.IsFavorite(id, v.Id),
 		}
 	}
 

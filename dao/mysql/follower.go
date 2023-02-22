@@ -32,6 +32,12 @@ func AddRelationCount(fromUserId, toUserId interface{}) (err error) {
 				log.Println("Fail", err)
 				return err
 			}
+			//增加对方粉丝数
+			if err = tx.Table("users").Where("id = ?", toUserId).
+				UpdateColumn("follower_count", gorm.Expr("follower_count + ?", 1)).Error; err != nil {
+				log.Println("Fail", err)
+				return err
+			}
 			return nil
 		}
 
@@ -48,6 +54,12 @@ func AddRelationCount(fromUserId, toUserId interface{}) (err error) {
 			log.Println("Fail", err)
 			return err
 		}
+		//增加对方粉丝数
+		if err = tx.Table("users").Where("id = ?", toUserId).
+			UpdateColumn("follower_count", gorm.Expr("follower_count + ?", 1)).Error; err != nil {
+			log.Println("Fail", err)
+			return err
+		}
 		return nil
 	})
 	if err != nil {
@@ -59,15 +71,30 @@ func AddRelationCount(fromUserId, toUserId interface{}) (err error) {
 // SubRelationCount 取消关注
 func SubRelationCount(fromUserId, toUserId interface{}) (err error) {
 	err = DB.Transaction(func(tx *gorm.DB) error {
-		if err = tx.Table("users").Where("id = ?", fromUserId).
-			UpdateColumn("follow_count", gorm.Expr("follow_count - ?", 1)).Error; err != nil {
+		id := -1
+		if err = tx.Table("followers").
+			Where("from_user_id = ? and to_user_id = ? and state = 1", fromUserId, toUserId).
+			Select("id").Find(&id).Error; err != nil {
 			log.Println("Fail", err)
 			return err
 		}
-		if err = tx.Table("followers").Where("from_user_id = ? and to_user_id = ?", fromUserId, toUserId).
-			Update("state", "0").Error; err != nil {
-			log.Println("Fail", err)
-			return err
+		if id != -1 {
+			if err = tx.Table("followers").Where("from_user_id = ? and to_user_id = ?", fromUserId, toUserId).
+				Update("state", "0").Error; err != nil {
+				log.Println("Fail", err)
+				return err
+			}
+			if err = tx.Table("users").Where("id = ?", fromUserId).
+				UpdateColumn("follow_count", gorm.Expr("follow_count - ?", 1)).Error; err != nil {
+				log.Println("Fail", err)
+				return err
+			}
+			if err = tx.Table("users").Where("id = ?", toUserId).
+				UpdateColumn("follower_count", gorm.Expr("follower_count - ?", 1)).Error; err != nil {
+				log.Println("Fail", err)
+				return err
+			}
+			return nil
 		}
 		return nil
 	})

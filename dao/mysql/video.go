@@ -7,13 +7,28 @@ import (
 )
 
 func InsertVideo(v *model.Video) (err error) {
-	if err = DB.Create(v).Error; err != nil {
-		log.Println("InsertVideo failed to insert", err)
+	//开启事务
+	err = DB.Transaction(func(tx *gorm.DB) error {
+		//存入视频数据
+		if err = tx.Create(v).Error; err != nil {
+			log.Println("InsertVideo failed to insert", err)
+			return err
+		}
+		//增加用户作品数
+		if err = tx.Table("users").Where("id = ?", v.AuthorId).
+			UpdateColumn("work_count", gorm.Expr("work_count + ?", 1)).Error; err != nil {
+			log.Println("InsertVideo failed to insert", err)
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return err
 	}
-	return
+	return nil
 }
 
-func QueryVideoList(id string, start interface{}) ([]model.Video, error) {
+func QueryVideoList(id, start interface{}) ([]model.Video, error) {
 	var list []model.Video
 	var tx *gorm.DB
 	if id == "" {
@@ -31,11 +46,14 @@ func QueryVideoList(id string, start interface{}) ([]model.Video, error) {
 	return list, tx.Error
 }
 
-func QueryFavorite(userId, videioId interface{}) bool {
-	n := 0
+func IsFavorite(userId, videioId interface{}) bool {
+	n := -1
 	DB.Table("user_favorite_video").
-		Select("count(*)").
-		Where("`user_id` = ? and `video_id` = ? and state = 1", userId, videioId).
+		Select("id").
+		Where("user_id = ? and video_id = ? and state = 1", userId, videioId).
 		Find(&n)
-	return n == 1
+	if n == -1 {
+		return false
+	}
+	return true
 }

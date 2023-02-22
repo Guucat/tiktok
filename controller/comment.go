@@ -46,6 +46,7 @@ func CommentAction(c *gin.Context) {
 		log.Println("Comment error", err)
 		return
 	}
+	isFollower := mysql.GetIsFollower(userId, userId)
 	comment := Comment{
 		Id: commentId,
 		User: User{
@@ -59,7 +60,7 @@ func CommentAction(c *gin.Context) {
 			TotalFavorited:  userMessage.TotalFavorited,
 			WorkCount:       userMessage.WorkCount,
 			FavoriteCount:   userMessage.FavoriteCount,
-			IsFollow:        userMessage.IsFollow,
+			IsFollow:        isFollower,
 		},
 		Content:    commentText,
 		CreateDate: time.Now().Format("01-02"),

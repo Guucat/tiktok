@@ -1,6 +1,6 @@
 # 
 # 项目介绍
-本仓库为仿抖音app服务端开发。<br />[接口文档](https://www.apifox.cn/apidoc/shared-09d88f32-0b6c-4157-9d07-a36d32d7a75c/api-50707523)<br />[基础版抖音app使用说明](https://bytedance.feishu.cn/docs/doccnM9KkBAdyDhg8qaeGlIz7S7)<br />`**服务端部署地址**`：[http://114.55.132.72:7080/](http://114.55.132.72:7080/)<br />极简版抖音项目划分为两大方向，`互动方向`和`社交方向`，两个方向均包含`基础功能`内容，在扩展功能上有所不同，具体内容见下表 
+本仓库为仿抖音app服务端开发。<br />[接口文档](https://www.apifox.cn/apidoc/shared-09d88f32-0b6c-4157-9d07-a36d32d7a75c/api-50707523)<br />[基础版抖音app使用说明](https://bytedance.feishu.cn/docs/doccnM9KkBAdyDhg8qaeGlIz7S7)<br />`服务端部署地址`：[http://114.55.132.72:7080/](http://114.55.132.72:7080/)<br />极简版抖音项目划分为两大方向，`互动方向`和`社交方向`，两个方向均包含`基础功能`内容，在扩展功能上有所不同，具体内容见下表 
 
 |  | **互动方向** |  | **社交方向** |  |
 | --- | --- | --- | --- | --- |

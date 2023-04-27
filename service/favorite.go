@@ -2,7 +2,7 @@ package service
 
 import (
 	"tiktok/dao/mysql"
-	"tiktok/model"
+	model2 "tiktok/pkg/model"
 )
 
 func FavoriteAction(videoId, actionType string, userId interface{}) (err error) {
@@ -12,10 +12,10 @@ func FavoriteAction(videoId, actionType string, userId interface{}) (err error) 
 	return mysql.SubFavoriteCount(videoId, userId)
 }
 
-func FavoriteList(userId interface{}) (videoMessage []model.Video, err error) {
+func FavoriteList(userId interface{}) (videoMessage []model2.Video, err error) {
 	return mysql.GetFavoriteListByUserId(userId)
 }
 
-func GetAuthorMessage(authorId interface{}) (model.User, error) {
+func GetAuthorMessage(authorId interface{}) (model2.User, error) {
 	return mysql.GetUserMessageById(authorId)
 }

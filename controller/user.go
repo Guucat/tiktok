@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"tiktok/dao/mysql"
 	. "tiktok/mid"
-	"tiktok/mid/jwt"
 	. "tiktok/mid/validate"
-	"tiktok/model"
+	"tiktok/pkg/jwt"
+	"tiktok/pkg/model"
 	s "tiktok/service"
 )
 

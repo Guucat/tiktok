@@ -16,3 +16,11 @@ type User struct {
 	IsFollow        bool   `json:"is_follow,omitempty" gorm:"default:(-)"`      // true-已关注，false-未关注
 	Model
 }
+
+type UserBaseInfo struct {
+	Id              int64  `json:"id"`                           // 用户id
+	Username        string `json:"username" validate:"required"` // 用户名称
+	Avatar          string `json:"avatar"`                       //用户头像
+	BackgroundImage string `json:"background_image"`             //用户个人页顶部大图
+	Signature       string `json:"signature"`                    // 用户签名
+}

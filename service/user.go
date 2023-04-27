@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"strconv"
 	. "tiktok/dao/mysql"
-	"tiktok/model"
+	"tiktok/pkg/model"
 )
 
 func Register(u *model.User) error {

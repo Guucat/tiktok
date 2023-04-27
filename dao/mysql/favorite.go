@@ -3,7 +3,7 @@ package mysql
 import (
 	"gorm.io/gorm"
 	"log"
-	"tiktok/model"
+	model2 "tiktok/pkg/model"
 )
 
 func AddFavoriteCount(videoId string, userId interface{}) (err error) {
@@ -104,7 +104,7 @@ func SubFavoriteCount(videoId string, userId interface{}) (err error) {
 	return nil
 }
 
-func GetFavoriteListByUserId(userId interface{}) (videoMessage []model.Video, err error) {
+func GetFavoriteListByUserId(userId interface{}) (videoMessage []model2.Video, err error) {
 	videoIds := make([]int, 0)
 	err = DB.Transaction(func(tx *gorm.DB) error {
 		if err = tx.Table("user_favorite_video").Where("user_id = ? AND state = 1", userId).
@@ -113,7 +113,7 @@ func GetFavoriteListByUserId(userId interface{}) (videoMessage []model.Video, er
 			return err
 		}
 		for _, videoId := range videoIds {
-			var video model.Video
+			var video model2.Video
 			if err = tx.Table("videos").Where("id = ?", videoId).
 				Find(&video).Error; err != nil {
 				log.Println("Fetch error", err)
@@ -130,7 +130,7 @@ func GetFavoriteListByUserId(userId interface{}) (videoMessage []model.Video, er
 	return videoMessage, nil
 }
 
-func GetUserMessageById(userId interface{}) (user model.User, err error) {
+func GetUserMessageById(userId interface{}) (user model2.User, err error) {
 	if err = DB.Table("users").Where("id = ?", userId).
 		Find(&user).Error; err != nil {
 		log.Println("No result", err)

@@ -3,7 +3,7 @@ package mysql
 import (
 	"gorm.io/gorm"
 	"log"
-	"tiktok/model"
+	"tiktok/pkg/model"
 )
 
 // AddComment 添加评论

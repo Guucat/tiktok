@@ -3,7 +3,7 @@ package mysql
 import (
 	"log"
 	"testing"
-	"tiktok/model"
+	"tiktok/pkg/model"
 )
 
 func TestInsertVideo(t *testing.T) {

@@ -3,7 +3,7 @@ package mysql
 import (
 	"gorm.io/gorm"
 	"log"
-	"tiktok/model"
+	"tiktok/pkg/model"
 )
 
 // AddRelationCount 关注

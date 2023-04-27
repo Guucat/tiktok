@@ -3,7 +3,7 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 	c "tiktok/controller"
-	"tiktok/mid/jwt"
+	"tiktok/pkg/jwt"
 )
 
 func SetupRouter() *gin.Engine {
@@ -15,10 +15,10 @@ func SetupRouter() *gin.Engine {
 	douyin.GET("/user/", jwt.Auth(), c.UserInfo)
 	douyin.POST("/user/login/", c.Login)
 	douyin.POST("/user/register/", c.Register)
+
 	douyin.POST("/publish/action/", jwt.Auth(), c.Upload)
 	douyin.GET("/publish/list/", jwt.Auth(), c.List)
 	douyin.GET("/feed/", c.Feed)
-
 	// 互动接口
 	douyin.POST("/favorite/action/", jwt.Auth(), c.FavoriteAction)
 	douyin.GET("/favorite/list/", jwt.Auth(), c.FavoriteList)

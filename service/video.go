@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"tiktok/dao/mysql"
 	. "tiktok/mid/oss"
-	"tiktok/model"
+	"tiktok/pkg/model"
 )
 
 const path = "./"

@@ -3,7 +3,7 @@ package mysql
 import (
 	"gorm.io/gorm"
 	"log"
-	"tiktok/model"
+	"tiktok/pkg/model"
 )
 
 func InsertVideo(v *model.Video) (err error) {

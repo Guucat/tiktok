@@ -2,7 +2,7 @@ package service
 
 import (
 	"tiktok/dao/mysql"
-	"tiktok/model"
+	"tiktok/pkg/model"
 )
 
 func CommentAction(videoId, commentId, userId, commentText interface{}) error {

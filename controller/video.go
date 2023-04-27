@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"tiktok/dao/mysql"
 	. "tiktok/mid"
-	"tiktok/model"
+	"tiktok/pkg/model"
 	s "tiktok/service"
 	"time"
 )

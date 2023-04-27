@@ -4,7 +4,7 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"strconv"
-	"tiktok/model"
+	"tiktok/pkg/model"
 )
 
 // true, if user exist.

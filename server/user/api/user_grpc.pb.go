@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -19,9 +20,19 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	User_Register_FullMethodName    = "/User/Register"
-	User_Login_FullMethodName       = "/User/Login"
-	User_GetUserInfo_FullMethodName = "/User/GetUserInfo"
+	User_Register_FullMethodName           = "/User/Register"
+	User_Login_FullMethodName              = "/User/Login"
+	User_GetUserInfo_FullMethodName        = "/User/GetUserInfo"
+	User_IncrTotalFavorited_FullMethodName = "/User/IncrTotalFavorited"
+	User_DecrTotalFavorited_FullMethodName = "/User/DecrTotalFavorited"
+	User_IncrWorkCount_FullMethodName      = "/User/IncrWorkCount"
+	User_DecrWorkCount_FullMethodName      = "/User/DecrWorkCount"
+	User_IncrFavoriteCount_FullMethodName  = "/User/IncrFavoriteCount"
+	User_DecrFavoriteCount_FullMethodName  = "/User/DecrFavoriteCount"
+	User_IncrFollowCount_FullMethodName    = "/User/IncrFollowCount"
+	User_DecrFollowCount_FullMethodName    = "/User/DecrFollowCount"
+	User_IncrFollowerCount_FullMethodName  = "/User/IncrFollowerCount"
+	User_DecrFollowerCount_FullMethodName  = "/User/DecrFollowerCount"
 )
 
 // UserClient is the client API for User service.
@@ -31,6 +42,16 @@ type UserClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	GetUserInfo(ctx context.Context, in *GetUserInfoRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error)
+	IncrTotalFavorited(ctx context.Context, in *OpCountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DecrTotalFavorited(ctx context.Context, in *OpCountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	IncrWorkCount(ctx context.Context, in *OpCountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DecrWorkCount(ctx context.Context, in *OpCountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	IncrFavoriteCount(ctx context.Context, in *OpCountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DecrFavoriteCount(ctx context.Context, in *OpCountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	IncrFollowCount(ctx context.Context, in *OpCountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DecrFollowCount(ctx context.Context, in *OpCountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	IncrFollowerCount(ctx context.Context, in *OpCountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DecrFollowerCount(ctx context.Context, in *OpCountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type userClient struct {
@@ -68,6 +89,96 @@ func (c *userClient) GetUserInfo(ctx context.Context, in *GetUserInfoRequest, op
 	return out, nil
 }
 
+func (c *userClient) IncrTotalFavorited(ctx context.Context, in *OpCountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, User_IncrTotalFavorited_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) DecrTotalFavorited(ctx context.Context, in *OpCountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, User_DecrTotalFavorited_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) IncrWorkCount(ctx context.Context, in *OpCountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, User_IncrWorkCount_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) DecrWorkCount(ctx context.Context, in *OpCountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, User_DecrWorkCount_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) IncrFavoriteCount(ctx context.Context, in *OpCountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, User_IncrFavoriteCount_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) DecrFavoriteCount(ctx context.Context, in *OpCountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, User_DecrFavoriteCount_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) IncrFollowCount(ctx context.Context, in *OpCountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, User_IncrFollowCount_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) DecrFollowCount(ctx context.Context, in *OpCountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, User_DecrFollowCount_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) IncrFollowerCount(ctx context.Context, in *OpCountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, User_IncrFollowerCount_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) DecrFollowerCount(ctx context.Context, in *OpCountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, User_DecrFollowerCount_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility
@@ -75,6 +186,16 @@ type UserServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	GetUserInfo(context.Context, *GetUserInfoRequest) (*GetUserInfoResponse, error)
+	IncrTotalFavorited(context.Context, *OpCountRequest) (*emptypb.Empty, error)
+	DecrTotalFavorited(context.Context, *OpCountRequest) (*emptypb.Empty, error)
+	IncrWorkCount(context.Context, *OpCountRequest) (*emptypb.Empty, error)
+	DecrWorkCount(context.Context, *OpCountRequest) (*emptypb.Empty, error)
+	IncrFavoriteCount(context.Context, *OpCountRequest) (*emptypb.Empty, error)
+	DecrFavoriteCount(context.Context, *OpCountRequest) (*emptypb.Empty, error)
+	IncrFollowCount(context.Context, *OpCountRequest) (*emptypb.Empty, error)
+	DecrFollowCount(context.Context, *OpCountRequest) (*emptypb.Empty, error)
+	IncrFollowerCount(context.Context, *OpCountRequest) (*emptypb.Empty, error)
+	DecrFollowerCount(context.Context, *OpCountRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -90,6 +211,36 @@ func (UnimplementedUserServer) Login(context.Context, *LoginRequest) (*LoginResp
 }
 func (UnimplementedUserServer) GetUserInfo(context.Context, *GetUserInfoRequest) (*GetUserInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserInfo not implemented")
+}
+func (UnimplementedUserServer) IncrTotalFavorited(context.Context, *OpCountRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IncrTotalFavorited not implemented")
+}
+func (UnimplementedUserServer) DecrTotalFavorited(context.Context, *OpCountRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DecrTotalFavorited not implemented")
+}
+func (UnimplementedUserServer) IncrWorkCount(context.Context, *OpCountRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IncrWorkCount not implemented")
+}
+func (UnimplementedUserServer) DecrWorkCount(context.Context, *OpCountRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DecrWorkCount not implemented")
+}
+func (UnimplementedUserServer) IncrFavoriteCount(context.Context, *OpCountRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IncrFavoriteCount not implemented")
+}
+func (UnimplementedUserServer) DecrFavoriteCount(context.Context, *OpCountRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DecrFavoriteCount not implemented")
+}
+func (UnimplementedUserServer) IncrFollowCount(context.Context, *OpCountRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IncrFollowCount not implemented")
+}
+func (UnimplementedUserServer) DecrFollowCount(context.Context, *OpCountRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DecrFollowCount not implemented")
+}
+func (UnimplementedUserServer) IncrFollowerCount(context.Context, *OpCountRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IncrFollowerCount not implemented")
+}
+func (UnimplementedUserServer) DecrFollowerCount(context.Context, *OpCountRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DecrFollowerCount not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 
@@ -158,6 +309,186 @@ func _User_GetUserInfo_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_IncrTotalFavorited_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OpCountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).IncrTotalFavorited(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_IncrTotalFavorited_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).IncrTotalFavorited(ctx, req.(*OpCountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_DecrTotalFavorited_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OpCountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).DecrTotalFavorited(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_DecrTotalFavorited_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).DecrTotalFavorited(ctx, req.(*OpCountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_IncrWorkCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OpCountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).IncrWorkCount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_IncrWorkCount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).IncrWorkCount(ctx, req.(*OpCountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_DecrWorkCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OpCountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).DecrWorkCount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_DecrWorkCount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).DecrWorkCount(ctx, req.(*OpCountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_IncrFavoriteCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OpCountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).IncrFavoriteCount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_IncrFavoriteCount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).IncrFavoriteCount(ctx, req.(*OpCountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_DecrFavoriteCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OpCountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).DecrFavoriteCount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_DecrFavoriteCount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).DecrFavoriteCount(ctx, req.(*OpCountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_IncrFollowCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OpCountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).IncrFollowCount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_IncrFollowCount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).IncrFollowCount(ctx, req.(*OpCountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_DecrFollowCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OpCountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).DecrFollowCount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_DecrFollowCount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).DecrFollowCount(ctx, req.(*OpCountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_IncrFollowerCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OpCountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).IncrFollowerCount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_IncrFollowerCount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).IncrFollowerCount(ctx, req.(*OpCountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_DecrFollowerCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OpCountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).DecrFollowerCount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_DecrFollowerCount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).DecrFollowerCount(ctx, req.(*OpCountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -176,6 +507,46 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserInfo",
 			Handler:    _User_GetUserInfo_Handler,
+		},
+		{
+			MethodName: "IncrTotalFavorited",
+			Handler:    _User_IncrTotalFavorited_Handler,
+		},
+		{
+			MethodName: "DecrTotalFavorited",
+			Handler:    _User_DecrTotalFavorited_Handler,
+		},
+		{
+			MethodName: "IncrWorkCount",
+			Handler:    _User_IncrWorkCount_Handler,
+		},
+		{
+			MethodName: "DecrWorkCount",
+			Handler:    _User_DecrWorkCount_Handler,
+		},
+		{
+			MethodName: "IncrFavoriteCount",
+			Handler:    _User_IncrFavoriteCount_Handler,
+		},
+		{
+			MethodName: "DecrFavoriteCount",
+			Handler:    _User_DecrFavoriteCount_Handler,
+		},
+		{
+			MethodName: "IncrFollowCount",
+			Handler:    _User_IncrFollowCount_Handler,
+		},
+		{
+			MethodName: "DecrFollowCount",
+			Handler:    _User_DecrFollowCount_Handler,
+		},
+		{
+			MethodName: "IncrFollowerCount",
+			Handler:    _User_IncrFollowerCount_Handler,
+		},
+		{
+			MethodName: "DecrFollowerCount",
+			Handler:    _User_DecrFollowerCount_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

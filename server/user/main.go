@@ -11,7 +11,7 @@ import (
 
 func main() {
 	dao.Init()
-	lis, err := net.Listen("tcp", ":7080")
+	lis, err := net.Listen("tcp", ":7030")
 	if err != nil {
 		log.Panicln("failed to listen: ", err)
 	}

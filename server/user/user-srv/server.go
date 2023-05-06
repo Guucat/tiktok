@@ -10,6 +10,7 @@ import (
 	"log"
 	"strconv"
 	"tiktok/pkg/cache"
+	"tiktok/pkg/jwt"
 	"tiktok/pkg/model"
 	"time"
 
@@ -33,28 +34,33 @@ func NewGrpcUserServer() *GrpcUserServer {
 func (g *GrpcUserServer) Register(c context.Context, r *user_proto.RegisterRequest) (*user_proto.RegisterResponse, error) {
 	user := model.User{}
 	if err := g.mysql.Where("username = ?", r.Username).First(&user).Error; err == nil {
-		return &user_proto.RegisterResponse{}, errors.New("账号已被注册")
+		return nil, errors.New("账号已被注册")
 	}
 
 	user = model.User{Username: r.Username, Password: r.Password}
 	if err := g.mysql.Table("users").Create(&user).Error; err != nil {
 		log.Println(err)
-		return &user_proto.RegisterResponse{}, errors.New("数据库插入失败")
+		return nil, errors.New("数据库插入失败")
 	}
 
+	token, _ := jwt.GenToken(user.Id)
 	return &user_proto.RegisterResponse{
 		UserId: user.Id,
+		Token:  token,
 	}, nil
 }
 
 func (g *GrpcUserServer) Login(c context.Context, r *user_proto.LoginRequest) (*user_proto.LoginResponse, error) {
-	user := model.User{}
-	if err := g.mysql.Where("username = ? and password = ?", r.Username, r.Password).First(&user).Error; err != nil {
-		return &user_proto.LoginResponse{}, errors.New("账号或密码错误")
+	var id int64
+	if err := g.mysql.Table("users").Select("id").Where("username = ? and password = ?", r.Username, r.Password).Find(&id).Limit(1).Error; err != nil || id == 0 {
+		return nil, errors.New("账号或密码错误")
 	}
 
+	fmt.Println(id)
+	token, _ := jwt.GenToken(id)
 	return &user_proto.LoginResponse{
-		UserId: user.Id,
+		UserId: id,
+		Token:  token,
 	}, nil
 }
 
@@ -76,7 +82,7 @@ func (g *GrpcUserServer) GetUserInfo(c context.Context, r *user_proto.GetUserInf
 
 	vals := g.redis.MGet(c,
 		"total_favorited_"+r.UserId,
-		"follower_count_"+r.UserId,
+		"work_count_"+r.UserId,
 		"favorite_count_"+r.UserId,
 		"follow_count_"+r.UserId,
 		"follower_count_"+r.UserId,
@@ -126,7 +132,7 @@ func (g *GrpcUserServer) GetUserInfo(c context.Context, r *user_proto.GetUserInf
 		followerCount, _ = strconv.ParseInt(vals[4].(string), 10, 64)
 		log.Println("4缓存Hit")
 	}
-	// 社交模块rpc方法，暂未是实现
+	// 社交模块rpc方法，暂未实现
 	isFollow := false
 	fmt.Println(time.Now().Sub(t1))
 	return &user_proto.GetUserInfoResponse{

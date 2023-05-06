@@ -1,0 +1,11 @@
+syntax = "proto3";
+option go_package="tiktok/server/snowflake/api/snowflake-proto";
+import "google/protobuf/empty.proto";
+
+message IdResponse {
+  int64 id = 1;
+}
+
+service Snowflake {
+  rpc GetId(google.protobuf.Empty) returns (IdResponse);
+}

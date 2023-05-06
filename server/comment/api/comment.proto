@@ -1,0 +1,52 @@
+syntax = "proto3";
+option go_package="tiktok/server/user/api/comment-proto";
+
+
+message CommentActionRequest {
+  string video_id = 1;
+  string me_id = 2;
+  // 1-发布评论，0-删除评论
+  string action_type = 3;
+  // 用户填写的评论内容，在action_type=1的时候使用
+  string comment_text = 4;
+  // 要删除的评论id，在action_type=2的时候使用
+  string comment_id = 5;
+  optional int64 len = 6;
+}
+
+message CommentActionResponse {
+  int64 id = 1;
+  string content = 2;
+  string create_date = 3;
+  UserInfo user = 4;
+}
+
+message CommentListRequest {
+  string video_id = 1;
+  string me_id = 2;
+}
+
+message CommentListResponse {
+  repeated CommentActionResponse comment_list = 1;
+}
+
+message UserInfo {
+    int64 id = 1;
+    string name = 2;
+    string avatar = 3;
+    string background_image = 4;
+    string  signature = 5;
+
+    int64 follow_count = 6;
+    int64 follower_count = 7;
+    bool is_follow = 8;
+
+    int64 total_favorited = 9;
+    int64 work_count = 10;
+    int64 favorite_count = 11;
+}
+
+service Comment {
+  rpc CommentAction(CommentActionRequest) returns(CommentActionResponse);
+  rpc CommentList(CommentListRequest) returns(CommentListResponse);
+}

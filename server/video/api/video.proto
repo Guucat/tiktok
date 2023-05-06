@@ -1,0 +1,80 @@
+syntax = "proto3";
+option go_package="tiktok/server/video/api/video-proto";
+import "google/protobuf/empty.proto";
+
+
+//message ListRequest {
+//  string user_id = 1;
+//  string me_id = 2;
+//}
+//
+//message ListResponse {
+//  repeated VideoInfo video_list = 1;
+//}
+
+//message UserInfo {
+//  int64 id = 1;
+//  string name = 2;
+//  string avatar = 3;
+//  string background_image = 4;
+//  string  signature = 5;
+//
+//  int64 follow_count = 6;
+//  int64 follower_count = 7;
+//  bool is_follow = 8;
+//
+//  int64 total_favorited = 9;
+//  int64 work_count = 10;
+//  int64 favorite_count = 11;
+//}
+
+//message FeedRequest {
+//  string latest_time = 1;
+//}
+//
+//message FeedResponse {
+//  string next_time = 1;
+//  repeated VideoInfo video_list = 2;
+//}
+
+message SaveVideoInfoRequest {
+  string id = 1;
+  string title = 2;
+  string author_id = 3;
+  string play_url = 4;
+  string cover_url = 5;
+}
+
+message VideoInfo {
+  int64 id = 1;
+  string play_url = 2;
+  string cover_url = 3;
+  int64 favorite_count = 4;
+  int64 comment_count = 5;
+  bool is_favorite = 6;
+  string title = 7;
+}
+
+message VideoInfoRequest {
+  string video_id = 1;
+  string me_id = 2;
+}
+
+message VideoId {
+  string  video_id = 1;
+}
+
+service video {
+  // 保存视频信息，写作品数到缓存
+  rpc SaveVideoInfo (SaveVideoInfoRequest) returns (google.protobuf.Empty);
+  rpc GetVideoInfo (VideoInfoRequest) returns (VideoInfo);
+
+
+
+  rpc IncrVideoLikeCount(VideoId) returns (google.protobuf.Empty);
+  rpc DecrVideoLikeCount(VideoId) returns (google.protobuf.Empty);
+
+  rpc IncrVideoCommentCount(VideoId) returns (google.protobuf.Empty);
+  rpc DecrVideoCommentCount(VideoId) returns (google.protobuf.Empty);
+}
+

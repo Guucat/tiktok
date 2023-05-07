@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/keepalive"
 	"log"
 	"net/http"
 	"os"
@@ -10,6 +11,7 @@ import (
 	"tiktok/pkg/model"
 	comment_proto "tiktok/server/comment/api"
 	user_proto "tiktok/server/user/api"
+	"time"
 )
 
 type H struct {
@@ -23,10 +25,19 @@ func NewH() *H {
 		log.Fatal("fail to dial: ", err)
 	}
 
+	kacp := keepalive.ClientParameters{
+		Time:                10 * time.Second, // send pings every 10 seconds if there is no activity
+		Timeout:             time.Second,      // wait 1 second for ping ack before considering the connection dead
+		PermitWithoutStream: true,             // send pings even without active streams
+	}
+	//myDnsResolver :=
 	ccUser, err := grpc.Dial("dns:///"+"service-user-clusterip:7030",
 		grpc.WithInsecure(),
 		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`),
 		grpc.WithBlock(),
+		grpc.WithResolvers(),
+		grpc.WithKeepaliveParams(kacp),
+		grpc.WithResolvers(),
 	)
 	if err != nil {
 		log.Fatal("fail to dial: ", err)

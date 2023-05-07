@@ -43,7 +43,7 @@ spec:
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 1
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: route
@@ -53,5 +53,5 @@ spec:
         app: route
     spec:
       containers:
-        - image: guptang/tiktok-route:v5
+        - image: guptang/tiktok-route:v6
           name: tiktok-route-container

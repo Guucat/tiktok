@@ -3,10 +3,12 @@ package comment_srv
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/Shopify/sarama"
 	"github.com/go-redis/redis/v8"
 	"github.com/golang/protobuf/ptypes/empty"
+	"golang.org/x/sync/singleflight"
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
 	"log"
@@ -27,6 +29,7 @@ type GrpcCommentServer struct {
 	kafka           sarama.SyncProducer
 	userClient      user_proto.UserClient
 	snowflakeClient snowflake_proto.SnowflakeClient
+	sf              *singleflight.Group
 }
 
 func NewGrpcCommentServer() *GrpcCommentServer {
@@ -45,6 +48,7 @@ func NewGrpcCommentServer() *GrpcCommentServer {
 		kafka:           dao.GetKafkaCon(),
 		userClient:      user_proto.NewUserClient(conn1),
 		snowflakeClient: snowflake_proto.NewSnowflakeClient(conn2),
+		sf:              &singleflight.Group{},
 	}
 }
 
@@ -101,7 +105,26 @@ func (g *GrpcCommentServer) CommentAction(c context.Context, r *comment_proto.Co
 	return &resp, nil
 
 }
-func (g *GrpcCommentServer) CommentList(c context.Context, r *comment_proto.CommentListRequest) (*comment_proto.CommentListResponse, error) {
+
+func (g *GrpcCommentServer) GetCommentIds(videoId string) (commentIds []int64, err error) {
+	commentIds = make([]int64, 0)
+	return commentIds, g.mysql.Table("comment").
+		Select("id").
+		Where("video_id = ? AND state = ?", videoId, 1).
+		Order("create_time DESC").
+		Find(&commentIds).Error
+}
+
+func (g *GrpcCommentServer) GetCommentsInfo(commentIds []int64, info *[]*model.Comment) (err error) {
+	// in 中的元素走的索引, 执行效率不会差
+	if err = g.mysql.Table("comment").Select("user_id, create_time, content").Where("id in ?", commentIds).
+		Find(&info).Error; err != nil {
+		log.Println(err)
+	}
+	return err
+}
+
+func (g *GrpcCommentServer) CommentList(c context.Context, r *comment_proto.CommentListRequest) (resp *comment_proto.CommentListResponse, err error) {
 	host, _ := os.Hostname()
 	log.Println("from comment srv: ", host)
 
@@ -112,22 +135,33 @@ func (g *GrpcCommentServer) CommentList(c context.Context, r *comment_proto.Comm
 	// id list 缓存
 	if g.redis.Exists(c, keyId).Val() != 1 {
 		fmt.Println("id list 缓存miss")
-		if err := g.mysql.Table("comment").Select("id").Where("video_id = ? AND state = ?", r.VideoId, 1).Order("create_time DESC").
-			Find(&commentIds).Error; err != nil {
-			log.Println(err)
-			return nil, err
+
+		// 单飞防缓存击穿
+		timeout := time.After(500 * time.Millisecond)
+		ch := g.sf.DoChan(r.VideoId, func() (interface{}, error) {
+			return g.GetCommentIds(r.VideoId)
+		})
+		select {
+		// 将QPS降低到进程数级别，避免单阻塞
+		case <-timeout:
+			g.sf.Forget(r.VideoId)
+			return nil, errors.New("db time out")
+		case commentIds, _ = <-ch:
+			if err != nil {
+				log.Println("数据库查询失败", err)
+			}
 		}
+
 		// 评论数为0
 		if len(commentIds) == 0 {
 			return &comment_proto.CommentListResponse{}, nil
 		}
+
 		pipe := g.redis.Pipeline()
 		for _, v := range commentIds {
 			pipe.RPush(c, keyId, v)
 		}
-		//err := g.redis.RPush(c, keyId, commentIds).Err()
-		_, err := pipe.Exec(c)
-		if err != nil {
+		if _, err = pipe.Exec(c); err != nil {
 			fmt.Println("id list 缓存设置失败", err)
 		}
 	} else {
@@ -139,18 +173,21 @@ func (g *GrpcCommentServer) CommentList(c context.Context, r *comment_proto.Comm
 		}
 	}
 
+	// 暂时不实现
+	// 如果之前存在id list, 则数据使用 in 批量查， 使用单飞防击穿
+	// 否则，遍历commentIds先查redis, 再查mysql，使用单飞防击穿
+
 	for _, id := range commentIds {
 		keyInfo := "comment_info_" + strconv.FormatInt(int64(id), 10)
 		info := model.Comment{}
 		// comment info 缓存
 		if g.redis.Exists(c, keyInfo).Val() != 1 {
 			fmt.Println("single comment info 缓存miss")
-			if err := g.mysql.Table("comment").Select("user_id, create_time, content").Where("id = ?", id).
+			if err = g.mysql.Table("comment").Select("user_id, create_time, content").Where("id = ?", id).
 				Find(&info).Error; err != nil {
 				log.Println(err)
-				return nil, err
 			}
-			if err := g.redis.HMSet(c, keyInfo, "user_id", info.UserId, "create_date", info.CreateDate, "content", info.Content).Err(); err != nil {
+			if err = g.redis.HMSet(c, keyInfo, "user_id", info.UserId, "create_date", info.CreateDate, "content", info.Content).Err(); err != nil {
 				log.Println("list userinfo sat failed", err)
 			}
 		} else {

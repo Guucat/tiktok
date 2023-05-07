@@ -129,6 +129,7 @@ func PushCommentId(videoId string) error {
 		//	return nil
 		//}
 		//redisCon.RPush(context.Background(), prefix+videoId, commentIds, cache.RandExpiredTimeSec(1, 1))
+		return nil
 	}
 	return redisCon.RPush(context.Background(), prefix+videoId, videoId).Err()
 }

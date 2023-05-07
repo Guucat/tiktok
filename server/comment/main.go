@@ -65,18 +65,20 @@ func Consumer(topic string) {
 					if err := dao.AddComment(&ca); err != nil {
 						fmt.Println("写数据库失败", err)
 					}
-					// 更新缓存
+					// 更新id缓存
 					if err := dao.PushCommentId(ca.VideoId); err != nil {
 						fmt.Println("写comment id list缓存失败", err)
 					}
-					// 更新缓存
+					// 更新count缓存
 					if err := dao.IncrCommentCount(ca.VideoId); err != nil {
 						fmt.Println("写comment count 缓存失败", err)
 					}
+
+					// 更新content缓存
 				} else { // 删除评论
 					// 先删数据库
 
-					// 再检查缓存，再遍历缓存获取index，再ltrim 删缓存
+					// 再检查缓存，存在则再遍历缓存获取index，再ltrim 删缓存
 				}
 
 			}

@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-user-clusterip
+spec:
+  type: ClusterIP
+  selector:
+    app: user
+  clusterIP: None
+  ports:
+    - port: 7030
+      targetPort: 7030
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-deployment
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  replicas: 2
+  selector:
+    matchLabels:
+      app: user
+  template:
+    metadata:
+      labels:
+        app: user
+    spec:
+      containers:
+        - image: guptang/tiktok-user:v1
+          name: tiktok-user-container

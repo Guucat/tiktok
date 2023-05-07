@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-comment-clusterip
+spec:
+  type: ClusterIP
+  selector:
+    app: comment
+  ports:
+    - port: 7010
+      targetPort: 7010
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: comment-deployment
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  replicas: 1
+  selector:
+    matchLabels:
+      app: comment
+  template:
+    metadata:
+      labels:
+        app: comment
+    spec:
+      containers:
+        - image: guptang/tiktok-comment:v1
+          name: tiktok-comment-container

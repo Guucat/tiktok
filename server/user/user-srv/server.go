@@ -8,6 +8,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
 	"log"
+	"os"
 	"strconv"
 	"tiktok/pkg/cache"
 	"tiktok/pkg/jwt"
@@ -51,6 +52,9 @@ func (g *GrpcUserServer) Register(c context.Context, r *user_proto.RegisterReque
 }
 
 func (g *GrpcUserServer) Login(c context.Context, r *user_proto.LoginRequest) (*user_proto.LoginResponse, error) {
+	host, _ := os.Hostname()
+	log.Println("from user srv: ", host)
+
 	var id int64
 	if err := g.mysql.Table("users").Select("id").Where("username = ? and password = ?", r.Username, r.Password).Find(&id).Limit(1).Error; err != nil || id == 0 {
 		return nil, errors.New("账号或密码错误")
@@ -65,6 +69,9 @@ func (g *GrpcUserServer) Login(c context.Context, r *user_proto.LoginRequest) (*
 }
 
 func (g *GrpcUserServer) GetUserInfo(c context.Context, r *user_proto.GetUserInfoRequest) (*user_proto.GetUserInfoResponse, error) {
+	host, _ := os.Hostname()
+	log.Println("from user srv: ", host)
+
 	t1 := time.Now()
 	id, _ := strconv.ParseInt(r.UserId, 10, 64)
 	baseUser := model.UserBaseInfo{Id: id}

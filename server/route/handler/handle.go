@@ -5,6 +5,7 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"tiktok/pkg/model"
 	comment_proto "tiktok/server/comment/api"
@@ -17,12 +18,16 @@ type H struct {
 }
 
 func NewH() *H {
-	ccComment, err := grpc.Dial("localhost:7010", grpc.WithInsecure())
+	ccComment, err := grpc.Dial("dns:///"+"service-comment-clusterip:7010", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("fail to dial: ", err)
 	}
 
-	ccUser, err := grpc.Dial("localhost:7030", grpc.WithInsecure())
+	ccUser, err := grpc.Dial("dns:///"+"service-user-clusterip:7030",
+		grpc.WithInsecure(),
+		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`),
+		grpc.WithBlock(),
+	)
 	if err != nil {
 		log.Fatal("fail to dial: ", err)
 	}
@@ -34,6 +39,8 @@ func NewH() *H {
 }
 
 func (h *H) Login(c *gin.Context) {
+	host, _ := os.Hostname()
+	log.Println("from route srv: ", host)
 	name := c.Query("username")
 	pwd := c.Query("password")
 

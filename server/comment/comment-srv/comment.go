@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
 	"log"
+	"os"
 	"strconv"
 	"tiktok/pkg/model"
 	comment_proto "tiktok/server/comment/api"
@@ -36,7 +37,7 @@ func NewGrpcCommentServer() *GrpcCommentServer {
 
 	conn2, err := grpc.Dial("localhost:7020", grpc.WithInsecure())
 	if err != nil {
-		log.Fatal("fail to dial snowflake srv: ", err)
+		log.Fatal("fail to dial snowflake.yaml srv: ", err)
 	}
 	return &GrpcCommentServer{
 		mysql:           dao.GetMysqlCon(),
@@ -61,6 +62,9 @@ func (g *GrpcCommentServer) SendMassage(topic string, data string) error {
 }
 
 func (g *GrpcCommentServer) CommentAction(c context.Context, r *comment_proto.CommentActionRequest) (*comment_proto.CommentActionResponse, error) {
+	host, _ := os.Hostname()
+	log.Println("from comment srv: ", host)
+
 	ca := model.CommentAction{
 		VideoId:    r.VideoId,
 		MeId:       r.MeId,
@@ -98,6 +102,9 @@ func (g *GrpcCommentServer) CommentAction(c context.Context, r *comment_proto.Co
 
 }
 func (g *GrpcCommentServer) CommentList(c context.Context, r *comment_proto.CommentListRequest) (*comment_proto.CommentListResponse, error) {
+	host, _ := os.Hostname()
+	log.Println("from comment srv: ", host)
+
 	keyId := "comment_list_" + r.VideoId
 	commentIds := make([]int64, 0)
 	var results []*comment_proto.CommentActionResponse
